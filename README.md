@@ -22,5 +22,5 @@ Finding the process id is not a easy task, we getting the process filename from 
 **Flow**
 - Loader.exe: Inject Payload.dll to explorer.exe.
 - Payload.dll: Hook NtCreateUserProcess and inject infection.dll.
-- Infection: Dll for continue injection.
+- Infection.dll: Final Injection.
 
