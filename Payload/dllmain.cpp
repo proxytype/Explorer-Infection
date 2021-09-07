@@ -26,8 +26,6 @@ typedef void PROCESS_ATTRIBUTE_LIST, * PPROCESS_ATTRIBUTE_LIST;
 
 const char* payload = "C:\\Users\\ThunderCracker\\Desktop\\Hijack\\Process-Infection\\x64\\Debug\\Infection.dll";
 
-typedef NTSTATUS(WINAPI* realRtlUnicodeStringToAnsiString)(IN PANSI_STRING destinationString, IN PCUNICODE_STRING sourceString, IN BOOLEAN allocateDestinationString);
-
 typedef NTSTATUS(NTAPI* realNtCreateUserProcess)
 (
     PHANDLE ProcessHandle,
@@ -46,10 +44,6 @@ typedef NTSTATUS(NTAPI* realNtCreateUserProcess)
 realNtCreateUserProcess originalNtCreateUserProcess = (realNtCreateUserProcess)GetProcAddress(GetModuleHandleA("ntdll.dll"),
     "NtCreateUserProcess");
 
-realRtlUnicodeStringToAnsiString originalRtlUnicodeStringToAnsiString = (realRtlUnicodeStringToAnsiString)GetProcAddress(GetModuleHandleA("ntdll.dll"),
-    "RtlUnicodeStringToAnsiString");
-
-
 DWORD WINAPI createMessageBox(LPCWSTR lpParam) {
     MessageBox(NULL, lpParam, L"Dll says:", MB_OK);
     return 0;
@@ -62,7 +56,6 @@ DWORD getProcessIDByName(PRTL_USER_PROCESS_PARAMETERS processParameters) {
     UNICODE_STRING EntryName;
     EntryName.MaximumLength = EntryName.Length = (USHORT)processParameters->ImagePathName.Length;
     EntryName.Buffer = &processParameters->ImagePathName.Buffer[0];
-    originalRtlUnicodeStringToAnsiString(&as, &EntryName, TRUE);
 
     DWORD pid = 0;
     HANDLE hProcessSnap;
