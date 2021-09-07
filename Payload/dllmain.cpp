@@ -1,4 +1,6 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
+// http://www.rohitab.com/discuss/topic/40191-ntcreateuserprocess/
+// https://gist.github.com/apsun/1adb6557a44ea8372e7cc27c3ad827ad
 #include "pch.h"
 #include<windows.h>
 #include <Psapi.h>
