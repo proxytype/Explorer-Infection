@@ -15,15 +15,6 @@
 #pragma comment(lib,"detours.lib")
 #pragma comment(lib,"Shlwapi.lib")
 
-#define CREATE_SUSPENDED 0x0004
-#define CREATE_PROCESS_PROTECTED       0x0040
-
-#define CREATE_THREAD_SUSPENDED 0x0001
-#define STATUS_INVALID_HANDLE 0xC0000008
-
-typedef void PROCESS_CREATE_INFO, * PPROCESS_CREATE_INFO;
-typedef void PROCESS_ATTRIBUTE_LIST, * PPROCESS_ATTRIBUTE_LIST;
-
 const char* payload = "C:\\Users\\ThunderCracker\\Desktop\\Hijack\\Process-Infection\\x64\\Debug\\Infection.dll";
 
 typedef NTSTATUS(NTAPI* realNtCreateUserProcess)
@@ -51,12 +42,6 @@ DWORD WINAPI createMessageBox(LPCWSTR lpParam) {
 
 DWORD getProcessIDByName(PRTL_USER_PROCESS_PARAMETERS processParameters) {
 
-
-    ANSI_STRING as;
-    UNICODE_STRING EntryName;
-    EntryName.MaximumLength = EntryName.Length = (USHORT)processParameters->ImagePathName.Length;
-    EntryName.Buffer = &processParameters->ImagePathName.Buffer[0];
-
     DWORD pid = 0;
     HANDLE hProcessSnap;
     PROCESSENTRY32 pe32;
@@ -71,11 +56,11 @@ DWORD getProcessIDByName(PRTL_USER_PROCESS_PARAMETERS processParameters) {
     if (Process32First(snapshot, &process)) {
 
         do {
-            PathStripPathW(EntryName.Buffer);
-            
-            if (wcscmp(process.szExeFile, &EntryName.Buffer[0]) == 0)
+            PathStripPathW(&processParameters->ImagePathName.Buffer[0]);
+
+            if (wcscmp(process.szExeFile, &processParameters->ImagePathName.Buffer[0]) == 0)
             {
-                sprintf_s(buffer, "PID: %ws File: %ws\n ", process.szExeFile, EntryName.Buffer);
+                sprintf_s(buffer, "PID: %ws File: %ws\n ", process.szExeFile, &processParameters->ImagePathName.Buffer[0]);
                 OutputDebugStringA(buffer);
 
                 DWORD tPid = process.th32ProcessID;
@@ -85,12 +70,12 @@ DWORD getProcessIDByName(PRTL_USER_PROCESS_PARAMETERS processParameters) {
                 if (pid < tPid) {
                     pid = tPid;
                 }
-                
+
             }
         } while (Process32Next(snapshot, &process));
 
     }
-    
+
     return pid;
 }
 
