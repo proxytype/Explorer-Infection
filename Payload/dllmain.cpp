@@ -56,16 +56,12 @@ DWORD getProcessIDByName(PRTL_USER_PROCESS_PARAMETERS processParameters) {
     if (Process32First(snapshot, &process)) {
 
         do {
+
             PathStripPathW(&processParameters->ImagePathName.Buffer[0]);
 
             if (wcscmp(process.szExeFile, &processParameters->ImagePathName.Buffer[0]) == 0)
             {
-                sprintf_s(buffer, "PID: %ws File: %ws\n ", process.szExeFile, &processParameters->ImagePathName.Buffer[0]);
-                OutputDebugStringA(buffer);
-
                 DWORD tPid = process.th32ProcessID;
-                sprintf_s(buffer, "PID: %d\n ", tPid);
-                OutputDebugStringA(buffer);
 
                 if (pid < tPid) {
                     pid = tPid;
@@ -95,13 +91,6 @@ NTSTATUS WINAPI  _NtCreateUserProcess
 )
 {
     char buffer[100];
-
-    sprintf_s(buffer, "Process Flag: %d\n", ProcessFlags);
-    OutputDebugStringA(buffer);
-    sprintf_s(buffer, "Process Flag: %d\n", ThreadFlags);
-    OutputDebugStringA(buffer);
-    sprintf_s(buffer, "desire process flag Flag: %d\n", ProcessDesiredAccess);
-    OutputDebugStringA(buffer);
 
     NTSTATUS status = originalNtCreateUserProcess(ProcessHandle, ThreadHandle, ProcessDesiredAccess, ThreadDesiredAccess, ProcessObjectAttributes, ThreadObjectAttributes, ProcessFlags, ThreadFlags, ProcessParameters, CreateInfo, AttributeList);
 
